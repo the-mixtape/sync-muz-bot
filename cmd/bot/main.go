@@ -3,20 +3,28 @@ package main
 import (
 	"flag"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"golang.org/x/net/proxy"
 	"log"
 	"net/http"
 	"net/url"
+	"sync-muz-bot/pkg/cache/local_cache"
 	"sync-muz-bot/pkg/telegram"
 	"sync-muz-bot/pkg/util"
+	"time"
+)
+
+const (
+	cacheDefaultExpiration = 5 * time.Minute
+	cacheCleanupInterval   = 10 * time.Minute
 )
 
 func main() {
 	botConfig := readConfig()
 	bot := createTgBotApi(botConfig.Token, botConfig.Socks5Proxy)
 
+	botCache := local_cache.NewBotCache(cacheDefaultExpiration, cacheCleanupInterval)
+
 	bot.Debug = true
-	telegramBot := telegram.NewBot(bot)
+	telegramBot := telegram.NewBot(bot, botCache)
 	if err := telegramBot.Start(); err != nil {
 		log.Fatal(err)
 	}
@@ -41,13 +49,7 @@ func createTgBotApi(token string, socks5 string) *tgbotapi.BotAPI {
 		if err != nil {
 			log.Printf("Failed to parse proxy URL:%s\n", err)
 		}
-		tgDialer, err := proxy.FromURL(tgProxyURL, proxy.Direct)
-		if err != nil {
-			log.Printf("Failed to obtain proxy dialer: %s\n", err)
-		}
-		tgTransport := &http.Transport{
-			Dial: tgDialer.Dial,
-		}
+		tgTransport := &http.Transport{Proxy: http.ProxyURL(tgProxyURL)}
 		client.Transport = tgTransport
 	}
 

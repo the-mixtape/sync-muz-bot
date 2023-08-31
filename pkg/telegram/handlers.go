@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	commandStart     = "start"
-	commandSettings  = "settings"
-	commandVkBinds   = "vk_binds"
-	commandStartSync = "start_sync"
+	commandStart = "start"
+	//commandSettings  = "settings"
+	//commandVkBinds   = "vk_binds"
+	//commandStartSync = "start_sync"
 )
 
 func (b *Bot) handleCommand(message *tgbotapi.Message) error {
@@ -21,22 +21,16 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 	}
 }
 
-func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "Привет")
-	_, err := b.bot.Send(msg)
-	return err
-}
-
-func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "Я не знаю такой команды")
-	_, err := b.bot.Send(msg)
-	return err
-}
-
 func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 	log.Printf("[%s] %s", message.From.UserName, message.Text)
 
 	msg := tgbotapi.NewMessage(message.Chat.ID, message.Text)
+	_, err := b.bot.Send(msg)
+	return err
+}
+
+func (b *Bot) handleCallbackQuery(query *tgbotapi.CallbackQuery) error {
+	msg := tgbotapi.NewMessage(query.Message.Chat.ID, query.Data)
 	_, err := b.bot.Send(msg)
 	return err
 }

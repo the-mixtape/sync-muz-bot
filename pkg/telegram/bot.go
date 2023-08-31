@@ -3,14 +3,19 @@ package telegram
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
+	"sync-muz-bot/pkg/cache"
 )
 
 type Bot struct {
-	bot *tgbotapi.BotAPI
+	bot      *tgbotapi.BotAPI
+	botCache cache.BotCache
 }
 
-func NewBot(bot *tgbotapi.BotAPI) *Bot {
-	return &Bot{bot: bot}
+func NewBot(bot *tgbotapi.BotAPI, c cache.BotCache) *Bot {
+	return &Bot{
+		bot:      bot,
+		botCache: c,
+	}
 }
 
 func (b *Bot) Start() error {
@@ -31,21 +36,24 @@ func (b *Bot) initializeUpdatesChannel(offset int, timeout int) tgbotapi.Updates
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) error {
 	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
+		if update.Message != nil {
+			if update.Message.IsCommand() {
+				err := b.handleCommand(update.Message)
+				if err != nil {
+					return err
+				}
+				continue
+			}
 
-		if update.Message.IsCommand() {
-			err := b.handleCommand(update.Message)
+			err := b.handleMessage(update.Message)
 			if err != nil {
 				return err
 			}
-			continue
-		}
-
-		err := b.handleMessage(update.Message)
-		if err != nil {
-			return err
+		} else if update.CallbackQuery != nil {
+			err := b.handleCallbackQuery(update.CallbackQuery)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
