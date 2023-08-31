@@ -1,2 +1,4 @@
 .bin
 .idea
+
+configs/bot.env
