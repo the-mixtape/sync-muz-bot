@@ -2,6 +2,7 @@ package telegram
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"sync-muz-bot/pkg/models"
 )
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
@@ -11,7 +12,19 @@ func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 	msg.ReplyMarkup = keyboard
 	msg.ParseMode = "html"
 
-	_, err := b.bot.Send(msg)
+	user := models.User{
+		Id:       message.Chat.ID,
+		Username: message.Chat.UserName,
+	}
+
+	// repository test
+	//_, err := b.repository.CreateUser(user)
+	//if err != nil {
+	//	user2, _ := b.repository.GetUser(message.Chat.ID)
+	//	print(user2.Username)
+	//}
+
+	_, err = b.bot.Send(msg)
 	return err
 }
 

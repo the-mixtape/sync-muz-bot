@@ -4,17 +4,20 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"sync-muz-bot/pkg/cache"
+	"sync-muz-bot/pkg/repository"
 )
 
 type Bot struct {
-	bot      *tgbotapi.BotAPI
-	botCache cache.BotCache
+	bot        *tgbotapi.BotAPI
+	botCache   cache.BotCache
+	repository *repository.Repository
 }
 
-func NewBot(bot *tgbotapi.BotAPI, c cache.BotCache) *Bot {
+func NewBot(bot *tgbotapi.BotAPI, c cache.BotCache, repos *repository.Repository) *Bot {
 	return &Bot{
-		bot:      bot,
-		botCache: c,
+		bot:        bot,
+		botCache:   c,
+		repository: repos,
 	}
 }
 

@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"net/url"
 	"sync-muz-bot/pkg/cache/local_cache"
+	"sync-muz-bot/pkg/repository"
+	"sync-muz-bot/pkg/repository/postgres"
 	"sync-muz-bot/pkg/telegram"
 	"sync-muz-bot/pkg/util"
 	"time"
@@ -23,8 +26,21 @@ func main() {
 
 	botCache := local_cache.NewBotCache(cacheDefaultExpiration, cacheCleanupInterval)
 
-	bot.Debug = true
-	telegramBot := telegram.NewBot(bot, botCache)
+	db, err := postgres.NewPostgresDB(postgres.Config{
+		Host:     botConfig.DBHost,
+		Port:     botConfig.DBPort,
+		Username: botConfig.DBUsername,
+		Password: botConfig.DBPassword,
+		DBName:   botConfig.DBName,
+		SSLMode:  botConfig.DBSSLMode,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	repos := repository.NewRepository(db)
+
+	telegramBot := telegram.NewBot(bot, botCache, repos)
 	if err := telegramBot.Start(); err != nil {
 		log.Fatal(err)
 	}
