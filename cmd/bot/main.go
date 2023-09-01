@@ -4,6 +4,7 @@ import (
 	"flag"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	_ "github.com/lib/pq"
+	"golang.org/x/exp/slog"
 	"log"
 	"net/http"
 	"net/url"
@@ -35,7 +36,7 @@ func main() {
 		SSLMode:  botConfig.DBSSLMode,
 	})
 	if err != nil {
-		log.Fatal(err)
+		slog.Error(err.Error())
 	}
 
 	repos := repository.NewRepository(db)
@@ -52,7 +53,7 @@ func readConfig() util.Config {
 
 	botConfig, err := util.LoadConfig(*configPath)
 	if err != nil {
-		log.Fatal("cannot load config:", err)
+		slog.Error("cannot load config:" + err.Error())
 	}
 
 	return botConfig
@@ -63,7 +64,7 @@ func createTgBotApi(token string, socks5 string, debug bool) *tgbotapi.BotAPI {
 	if len(socks5) > 0 {
 		tgProxyURL, err := url.Parse(socks5)
 		if err != nil {
-			log.Printf("Failed to parse proxy URL:%s\n", err)
+			slog.Error("Failed to parse proxy URL: " + err.Error())
 		}
 		tgTransport := &http.Transport{Proxy: http.ProxyURL(tgProxyURL)}
 		client.Transport = tgTransport
@@ -71,7 +72,7 @@ func createTgBotApi(token string, socks5 string, debug bool) *tgbotapi.BotAPI {
 
 	bot, err := tgbotapi.NewBotAPIWithClient(token, tgbotapi.APIEndpoint, client)
 	if err != nil {
-		log.Panic(err)
+		slog.Error(err.Error())
 	}
 	bot.Debug = debug
 	return bot

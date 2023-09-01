@@ -7,8 +7,9 @@ import (
 )
 
 type User interface {
-	CreateUser(user models.User) (int, error)
+	CreateUser(id int64, username string) error
 	GetUser(id int64) (models.User, error)
+	ExistsUser(id int64) (bool, error)
 }
 
 type Repository struct {
