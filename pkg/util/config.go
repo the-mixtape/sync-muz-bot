@@ -5,6 +5,7 @@ import "github.com/spf13/viper"
 type Config struct {
 	Token       string `mapstructure:"TOKEN"`
 	Socks5Proxy string `mapstructure:"SOCKS5_PROXY"`
+	Debug       bool   `mapstructure:"DEBUG"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

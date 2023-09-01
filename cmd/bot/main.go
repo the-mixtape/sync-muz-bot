@@ -19,7 +19,7 @@ const (
 
 func main() {
 	botConfig := readConfig()
-	bot := createTgBotApi(botConfig.Token, botConfig.Socks5Proxy)
+	bot := createTgBotApi(botConfig.Token, botConfig.Socks5Proxy, botConfig.Debug)
 
 	botCache := local_cache.NewBotCache(cacheDefaultExpiration, cacheCleanupInterval)
 
@@ -42,7 +42,7 @@ func readConfig() util.Config {
 	return botConfig
 }
 
-func createTgBotApi(token string, socks5 string) *tgbotapi.BotAPI {
+func createTgBotApi(token string, socks5 string, debug bool) *tgbotapi.BotAPI {
 	client := &http.Client{}
 	if len(socks5) > 0 {
 		tgProxyURL, err := url.Parse(socks5)
@@ -57,5 +57,6 @@ func createTgBotApi(token string, socks5 string) *tgbotapi.BotAPI {
 	if err != nil {
 		log.Panic(err)
 	}
+	bot.Debug = debug
 	return bot
 }
