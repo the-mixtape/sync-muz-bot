@@ -9,8 +9,11 @@ type BotCache struct {
 	localCache *cache.Cache
 }
 
-func NewBotCache(defaultExpiration time.Duration, cleanupInterval time.Duration) *BotCache {
-	c := cache.New(defaultExpiration, cleanupInterval)
+func NewBotCache(defaultExpiration int, cleanupInterval int) *BotCache {
+	defaultExpirationDuration := time.Duration(defaultExpiration) * time.Minute
+	cleanupIntervalDuration := time.Duration(cleanupInterval) * time.Minute
+
+	c := cache.New(defaultExpirationDuration, cleanupIntervalDuration)
 	return &BotCache{localCache: c}
 }
 

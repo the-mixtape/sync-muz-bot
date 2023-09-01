@@ -13,19 +13,14 @@ import (
 	"sync-muz-bot/pkg/repository/postgres"
 	"sync-muz-bot/pkg/telegram"
 	"sync-muz-bot/pkg/util"
-	"time"
-)
-
-const (
-	cacheDefaultExpiration = 5 * time.Minute
-	cacheCleanupInterval   = 10 * time.Minute
+	"sync-muz-bot/pkg/vk_api"
 )
 
 func main() {
 	botConfig := readConfig()
-	bot := createTgBotApi(botConfig.Token, botConfig.Socks5Proxy, botConfig.Debug)
-
-	botCache := local_cache.NewBotCache(cacheDefaultExpiration, cacheCleanupInterval)
+	bot := createTgBotApi(botConfig.BotToken, botConfig.Socks5Proxy, botConfig.BotDebug)
+	vkApi := vk_api.NewVKApi(botConfig.VkApiToken)
+	botCache := local_cache.NewBotCache(botConfig.CacheDefaultExpiration, botConfig.CacheCleanupInterval)
 
 	db, err := postgres.NewPostgresDB(postgres.Config{
 		Host:     botConfig.DBHost,
@@ -41,7 +36,7 @@ func main() {
 
 	repos := repository.NewRepository(db)
 
-	telegramBot := telegram.NewBot(bot, botCache, repos)
+	telegramBot := telegram.NewBot(bot, botCache, repos, vkApi)
 	if err := telegramBot.Start(); err != nil {
 		log.Fatal(err)
 	}

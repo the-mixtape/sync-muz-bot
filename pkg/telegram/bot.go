@@ -5,19 +5,22 @@ import (
 	"log"
 	"sync-muz-bot/pkg/cache"
 	"sync-muz-bot/pkg/repository"
+	"sync-muz-bot/pkg/vk_api"
 )
 
 type Bot struct {
 	bot        *tgbotapi.BotAPI
 	botCache   cache.BotCache
 	repository *repository.Repository
+	vkApi      *vk_api.VkApi
 }
 
-func NewBot(bot *tgbotapi.BotAPI, c cache.BotCache, repos *repository.Repository) *Bot {
+func NewBot(bot *tgbotapi.BotAPI, c cache.BotCache, repos *repository.Repository, vkApi *vk_api.VkApi) *Bot {
 	return &Bot{
 		bot:        bot,
 		botCache:   c,
 		repository: repos,
+		vkApi:      vkApi,
 	}
 }
 
