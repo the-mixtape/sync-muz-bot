@@ -14,7 +14,7 @@ func getLoggerMsg(msg string) string {
 }
 
 func NewVKApi(token string) *VkApi {
-	vkApi := VkApi{vk: api.NewVK(token)}
+	vkApi := VkApi{api.NewVK(token)}
 
 	_, userName, err := vkApi.GetUserIdAndName(nil)
 	if err != nil {

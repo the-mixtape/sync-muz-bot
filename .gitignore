@@ -1,4 +1,6 @@
 .bin
 .idea
 
-configs/bot.env
+telegram-bot/configs/bot.env
+
+__pycache__
