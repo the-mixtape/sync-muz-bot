@@ -14,6 +14,8 @@ const (
 	callbackStartSync     = "start_sync"
 	callbackMainMenuView  = "main_menu"
 	callbackVkMuzView     = "vk_muz_view"
+	callbackEditVkId      = "vk_muz_edit"
+	callbackDeleteVkId    = "vk_muz_delete"
 	callbackYandexMuzView = "yandex_muz_view"
 	callbackSettingsView  = "settings_view"
 )
@@ -49,6 +51,8 @@ func (b *Bot) handleCallbackQuery(query *tgbotapi.CallbackQuery) error {
 		return b.handleCallbackMainMenu(query)
 	case callbackVkMuzView:
 		return b.handleCallbackVkMuzView(query)
+	case callbackEditVkId:
+		return b.handleCallbackEditVkId(query)
 	case callbackYandexMuzView:
 		return b.handleCallbackYandexMuzView(query)
 	default:

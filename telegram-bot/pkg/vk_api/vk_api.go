@@ -9,6 +9,11 @@ type VkApi struct {
 	vk *api.VK
 }
 
+type VkUserInfo struct {
+	UserId   int
+	UserName string
+}
+
 func getLoggerMsg(msg string) string {
 	return "[VkApi] " + msg
 }
@@ -16,17 +21,17 @@ func getLoggerMsg(msg string) string {
 func NewVKApi(token string) *VkApi {
 	vkApi := VkApi{api.NewVK(token)}
 
-	_, userName, err := vkApi.GetUserIdAndName(nil)
+	userInfo, err := vkApi.GetUserIdAndName(nil)
 	if err != nil {
 		slog.Error(getLoggerMsg("Failed to retrieve user id and name"))
 		return nil
 	}
-	slog.Info(getLoggerMsg("Authorized on account " + userName))
+	slog.Info(getLoggerMsg("Authorized on account " + userInfo.UserName))
 
 	return &vkApi
 }
 
-func (vkApi *VkApi) GetUserIdAndName(id interface{}) (userId int, userName string, err error) {
+func (vkApi *VkApi) GetUserIdAndName(id interface{}) (userInfo VkUserInfo, err error) {
 	var params api.Params = nil
 	if id != nil {
 		params = api.Params{"user_ids": id}
@@ -34,9 +39,9 @@ func (vkApi *VkApi) GetUserIdAndName(id interface{}) (userId int, userName strin
 
 	info, err := vkApi.vk.UsersGet(params)
 	if err == nil {
-		userInfo := info[0]
-		userId = userInfo.ID
-		userName = userInfo.FirstName + " " + userInfo.LastName
+		infoResponse := info[0]
+		userInfo.UserId = infoResponse.ID
+		userInfo.UserName = infoResponse.FirstName + " " + infoResponse.LastName
 	}
 	return
 }

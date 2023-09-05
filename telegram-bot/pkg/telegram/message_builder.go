@@ -56,8 +56,42 @@ func (b *Bot) buildMsgHelpView() (string, tgbotapi.InlineKeyboardMarkup) {
 	return msgText, numericKeyboard
 }
 
-func (b *Bot) buildMsgVkMuzView() (string, tgbotapi.InlineKeyboardMarkup) {
-	return b.buildMsgWIP()
+func (b *Bot) buildMsgVkMuzView(vkId *int64, vkName *string) (string, tgbotapi.InlineKeyboardMarkup) {
+	var numericKeyboard = tgbotapi.InlineKeyboardMarkup{}
+
+	var msgText = ""
+	if vkId == nil {
+		msgText = "На данный момент страница <b>ВК</b> для синхронизации не указана"
+
+		newButton := []tgbotapi.InlineKeyboardButton{
+			tgbotapi.NewInlineKeyboardButtonData("🔗 Привязать страницу ВК", callbackEditVkId),
+		}
+		numericKeyboard.InlineKeyboard = append(numericKeyboard.InlineKeyboard, newButton)
+
+	} else {
+		msgText = fmt.Sprintf(`Привязан аккаунт <b>ВК</b>:
+Имя - %s
+ID - %d
+`, *vkName, vkId)
+
+		newButtons := []tgbotapi.InlineKeyboardButton{
+			tgbotapi.NewInlineKeyboardButtonData("🔗 Изменить привязку ВК", callbackEditVkId),
+			tgbotapi.NewInlineKeyboardButtonData("❌ Удалить привязку ВК", callbackDeleteVkId),
+		}
+		numericKeyboard.InlineKeyboard = append(numericKeyboard.InlineKeyboard, newButtons)
+	}
+
+	mainMenuButton := []tgbotapi.InlineKeyboardButton{
+		tgbotapi.NewInlineKeyboardButtonData("🔙 Главное меню", callbackMainMenuView),
+	}
+	numericKeyboard.InlineKeyboard = append(numericKeyboard.InlineKeyboard, mainMenuButton)
+
+	return msgText, numericKeyboard
+}
+
+func (b *Bot) buildMsgEditVkId() string {
+	return `В следующем сообщении отправьте ссылку на профиль <b>ВК</b>, который вы хотите привязать.
+Важный момент, чтобы синхронизация музыки работала, доступ к ней должен быть открыт.`
 }
 
 func (b *Bot) buildMsgYandexMuzView() (string, tgbotapi.InlineKeyboardMarkup) {
